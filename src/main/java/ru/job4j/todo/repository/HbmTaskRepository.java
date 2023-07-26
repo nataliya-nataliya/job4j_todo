@@ -6,12 +6,14 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Task;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
-public class HbmTaskRepository implements TaskRepository{
+public class HbmTaskRepository implements TaskRepository {
     private final SessionFactory sf;
 
     @Override
@@ -55,6 +57,46 @@ public class HbmTaskRepository implements TaskRepository{
 
     @Override
     public Collection<Task> findAllOrderById() {
-        return null;
+        Session session = sf.openSession();
+        List<Task> taskList = new ArrayList<>();
+        try {
+            session.beginTransaction();
+            taskList = session.createQuery(
+                    "from Task", Task.class).list();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
+        return taskList;
+    }
+
+    @Override
+    public Collection<Task> findAllOrderByIdWhereDoneIsTrue() {
+        Session session = sf.openSession();
+        List<Task> taskList = new ArrayList<>();
+        try {
+            session.beginTransaction();
+            taskList = session.createQuery(
+                    "from Task where done = true", Task.class).list();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
+        return taskList;
+    }
+
+    @Override
+    public Collection<Task> findAllOrderByIdWhereDoneIsFalse() {
+        Session session = sf.openSession();
+        List<Task> taskList = new ArrayList<>();
+        try {
+            session.beginTransaction();
+            taskList = session.createQuery(
+                    "from Task where done = false", Task.class).list();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
+        return taskList;
     }
 }

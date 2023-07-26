@@ -1,11 +1,13 @@
 package ru.job4j.todo.service;
 
+import org.springframework.stereotype.Service;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.repository.TaskRepository;
 
 import java.util.Collection;
 import java.util.Optional;
 
+@Service
 public class SimpleTaskService implements TaskService {
     private final TaskRepository taskRepository;
 
@@ -36,5 +38,15 @@ public class SimpleTaskService implements TaskService {
     @Override
     public Collection<Task> findAllOrderById() {
         return taskRepository.findAllOrderById();
+    }
+
+    @Override
+    public Collection<Task> findAllOrderByIdWhereDoneIsTrue() {
+        return taskRepository.findAllOrderByIdWhereDoneIsTrue();
+    }
+
+    @Override
+    public Collection<Task> findAllOrderByIdWhereDoneIsFalse() {
+        return taskRepository.findAllOrderByIdWhereDoneIsFalse();
     }
 }

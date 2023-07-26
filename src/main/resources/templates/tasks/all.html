@@ -21,7 +21,6 @@
 <div class="container-fluid p-0">
     <header th:insert="blocks/header :: header"></header>
     <div class="container mt-2">
-        <h3>To Do Task</h3>
         <div class="d-flex justify-content-between">
             <ul class="list-inline" style="list-style-type: none;">
                 <li class="list-inline-item">
@@ -38,7 +37,7 @@
                 </li>
             </ul>
             <div>
-                <a th:href="@{tasks/create}" class="btn btn-primary rounded-pill px-4"
+                <a th:href="@{/create}" class="btn btn-primary rounded-pill px-4"
                    style="background-color: #B57EDC; border: none;">+Add</a>
             </div>
         </div>

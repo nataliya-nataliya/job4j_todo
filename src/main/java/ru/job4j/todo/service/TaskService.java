@@ -15,4 +15,8 @@ public interface TaskService {
     Optional<Task> findById(int id);
 
     Collection<Task> findAllOrderById();
+
+    Collection<Task> findAllOrderByIdWhereDoneIsTrue();
+
+    Collection<Task> findAllOrderByIdWhereDoneIsFalse();
 }

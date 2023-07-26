@@ -21,24 +21,24 @@
 <div class="container-fluid p-0">
     <header th:insert="blocks/header :: header"></header>
     <div class="container mt-2">
-        <h3>To Do Task</h3>
         <div class="d-flex justify-content-between">
             <ul class="list-inline" style="list-style-type: none;">
                 <li class="list-inline-item">
-                    <a th:href="@{/tasks}" class="btn btn-primary rounded-pill px-4 active"
-                       style="background-color: #8342B0; border: 3px solid #6c757d; color: white;">All</a>
+                    <!-- Add style for active button (bright lavender color and thick gray border) -->
+                    <a th:href="@{/tasks}" class="btn btn-primary rounded-pill px-4"
+                       style="background-color: #B57EDC; border: none;">All</a>
                 </li>
                 <li class="list-inline-item">
                     <a th:href="@{/tasks/done}" class="btn btn-primary rounded-pill px-4"
-                       style="background-color: #B57EDC; border: none;">Done</a>
+                       style="background-color: #B57EDC; border: none">Done</a>
                 </li>
                 <li class="list-inline-item">
-                    <a th:href="@{/tasks/undone}" class="btn btn-primary rounded-pill px-4"
-                       style="background-color: #B57EDC; border: none;">Undone</a>
+                    <a th:href="@{/tasks/undone}" class="btn btn-primary rounded-pill px-4 active"
+                       style="background-color: #8342B0; border: 3px solid #6c757d; color: white;">Undone</a>
                 </li>
             </ul>
             <div>
-                <a th:href="@{tasks/create}" class="btn btn-primary rounded-pill px-4"
+                <a th:href="@{/create}" class="btn btn-primary rounded-pill px-4"
                    style="background-color: #B57EDC; border: none;">+Add</a>
             </div>
         </div>
