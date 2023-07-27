@@ -21,6 +21,9 @@
 <div class="container-fluid p-0">
     <header th:insert="blocks/header :: header"></header>
     <div class="container mt-2">
+        <div class="mb-3" th:if="${error}">
+            <p class="text-danger" th:text="${error}"></p>
+        </div>
         <div class="d-flex justify-content-between">
             <ul class="list-inline" style="list-style-type: none;">
                 <li class="list-inline-item">
@@ -56,8 +59,8 @@
                 <tbody>
                 <tr th:each="task, rowIndex : ${tasks}"
                     th:style="${rowIndex.even} ? 'background-color: #F1DCFF;' : 'background-color: #ffffff;'">
-                    <td th:text="${task.name}"/>
-                    <td th:text="${#temporals.format(task.created, 'dd-MM-yyyy HH:mm:ss')}"/>
+                    <td><a th:text="${task.name}" th:href="@{/tasks/{taskId}(taskId=${task.id})}"></a>
+                    </td>                    <td th:text="${#temporals.format(task.created, 'dd-MM-yyyy HH:mm:ss')}"/>
                     <td>
                         <span th:if="${task.done}">
                                 <i class="fas fa-check-circle" style="color: #B57EDC; font-size: 24px;"></i>

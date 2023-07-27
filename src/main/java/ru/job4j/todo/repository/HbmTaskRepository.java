@@ -40,8 +40,11 @@ public class HbmTaskRepository implements TaskRepository {
             session.beginTransaction();
             session.createQuery(
                             "update Task set name = :fName, description = :fDescription,"
-                                    + "created = :fCreated, done = :fDone where id = :fid")
+                                    + "created = :fCreated, done = :fDone where id = :fId")
                     .setParameter("fName", task.getName())
+                    .setParameter("fDescription", task.getDescription())
+                    .setParameter("fCreated", task.getCreated())
+                    .setParameter("fDone", task.isDone())
                     .setParameter("fId", task.getId())
                     .executeUpdate();
             session.getTransaction().commit();
@@ -52,7 +55,19 @@ public class HbmTaskRepository implements TaskRepository {
 
     @Override
     public Optional<Task> findById(int id) {
-        return Optional.empty();
+        Optional<Task> optionalTask = Optional.empty();
+        Session session = sf.openSession();
+        try {
+            session.beginTransaction();
+            optionalTask = session.createQuery(
+                            "from Task where id = : fId", Task.class)
+                    .setParameter("fId", id)
+                    .uniqueResultOptional();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
+        return optionalTask;
     }
 
     @Override
@@ -62,7 +77,7 @@ public class HbmTaskRepository implements TaskRepository {
         try {
             session.beginTransaction();
             taskList = session.createQuery(
-                    "from Task", Task.class).list();
+                    "from Task order by id", Task.class).list();
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
@@ -77,7 +92,7 @@ public class HbmTaskRepository implements TaskRepository {
         try {
             session.beginTransaction();
             taskList = session.createQuery(
-                    "from Task where done = true", Task.class).list();
+                    "from Task where done = true order by id", Task.class).list();
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
@@ -92,7 +107,7 @@ public class HbmTaskRepository implements TaskRepository {
         try {
             session.beginTransaction();
             taskList = session.createQuery(
-                    "from Task where done = false", Task.class).list();
+                    "from Task where done = false order by id", Task.class).list();
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
