@@ -25,20 +25,35 @@
               enctype="multipart/form-data">
             <div class="row mb-3">
                 <div class="col-9">
-                    <p><strong style="font-weight: bold; font-size: 24px;" th:text="${task.name}"></strong>
-                    </p>
+                    <p><strong style="font-weight: bold; font-size: 48px;" th:text="${task.name}"></strong></p>
                     <hr style="border: 1px solid #ccc;">
+                </div>
+                <div class="col-3 text-right">
+                <span th:if="${task.done}" class="text-success">
+                    <i class="fas fa-check-circle" style="font-size: 4em; color: #B57EDC;"></i>
+                </span>
+                    <span th:if="${!task.done}" class="text-danger">
+                    <i class="fas fa-times-circle" style="font-size: 4em; color: #B57EDC;"></i>
+                </span>
+                    <br>
+                    <small style="font-size: 1.1em;">
+                        <span th:text="|Created: ${#temporals.format(task.created, 'dd-MM-yyyy HH:mm:ss')}|"></span>
+                    </small>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-8">
                     <span th:text="${task.description}"></span>
                 </div>
             </div>
             <div class="mb-3 row">
-                <div class="col-1">
-                    <a class="btn btn-light w-100"
+                <div class="col-2">
+                    <a class="btn rounded-pill px-4 w-100"
                        style="color: #fff; background-color: #adb5bd; border: 2px solid #fff;" th:href="@{/tasks}">Cancel</a>
                 </div>
                 <div class="col-2">
                     <form class="mt-3" th:action="@{/tasks/{id}(id=${task.id})}" method="post" th:object="${task}">
-                        <button class="btn" type="submit"
+                        <button class="btn rounded-pill px-4" type="submit"
                                 th:style="'background-color: #B57EDC; color: #fff; border: 2px solid #B57EDC; width: 100%;'"
                                 style="display: flex; align-items: center; justify-content: center;">
                             <i th:if="${task.done}" class="fas fa-times" style="margin-right: 5px;"></i>
@@ -47,12 +62,12 @@
                         </button>
                     </form>
                 </div>
-                <div class="col-1">
-                    <a class="btn" style="background-color: #E893CF; width: 100%; color: #fff;"
+                <div class="col-2">
+                    <a class="btn rounded-pill px-4" style="background-color: #E893CF; width: 100%; color: #fff;"
                        th:href="@{/tasks/delete/{id}(id=${task.id})}">Delete</a>
                 </div>
-                <div class="col-1">
-                    <a class="btn" style="background-color: #B57EDC; width: 100%; color: #fff;"
+                <div class="col-2">
+                    <a class="btn rounded-pill px-4" style="background-color: #B57EDC; width: 100%; color: #fff;"
                        th:href="@{/tasks/edit/{id}(id=${task.id})}">Edit</a>
                 </div>
             </div>

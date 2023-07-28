@@ -3,10 +3,7 @@ package ru.job4j.todo.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
 
@@ -29,10 +26,6 @@ public class TaskController {
     @GetMapping("/done")
     public String getAllWhereDoneIsTrue(Model model) {
         model.addAttribute("tasks", taskService.findAllOrderByIdWhereDoneIsTrue());
-        if (taskService.findAllOrderByIdWhereDoneIsTrue().isEmpty()) {
-            model.addAttribute("error", "Completed tasks list is empty");
-            return "tasks/done";
-        }
         return "tasks/done";
     }
 
@@ -62,7 +55,61 @@ public class TaskController {
         }
         Task task = taskOptional.get();
         task.setDone(!task.isDone());
-        taskService.update(task);
-        return String.format("redirect:/tasks/%d", task.getId());
+        try {
+            taskService.update(task);
+            return String.format("redirect:/tasks/%d", task.getId());
+        } catch (Exception exception) {
+            model.addAttribute("message", exception.getMessage());
+            return "errors/404";
+        }
+    }
+
+    @GetMapping("/create")
+    public String getCreationPage(Model model) {
+        return "tasks/create";
+    }
+
+    @PostMapping("/create")
+    public String create(@ModelAttribute Task task, Model model) {
+        try {
+            taskService.save(task);
+            return "redirect:/tasks";
+        } catch (Exception exception) {
+            model.addAttribute("message", exception.getMessage());
+            return "errors/404";
+        }
+    }
+
+    @GetMapping("/delete/{id}")
+    public String delete(Model model, @PathVariable int id) {
+        var isDeleted = taskService.deleteById(id);
+        if (!isDeleted) {
+            model.addAttribute("message", "Task with the specified ID was not found");
+            return "errors/404";
+        }
+        return "redirect:/tasks";
+    }
+
+
+    @GetMapping("/edit/{id}")
+    public String editById(Model model, @PathVariable int id) {
+        var taskOptional = taskService.findById(id);
+        if (taskOptional.isEmpty()) {
+            model.addAttribute("message", "Task with the specified ID was not found");
+            return "errors/404";
+        }
+        model.addAttribute("task", taskOptional.get());
+        return "tasks/edit";
+    }
+
+    @PostMapping("/update")
+    public String update(@ModelAttribute Task task, Model model) {
+        try {
+            taskService.update(task);
+            return "redirect:/tasks";
+        } catch (Exception exception) {
+            model.addAttribute("message", exception.getMessage());
+            return "errors/404";
+        }
     }
 }

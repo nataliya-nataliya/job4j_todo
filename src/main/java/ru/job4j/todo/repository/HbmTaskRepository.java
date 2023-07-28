@@ -31,7 +31,18 @@ public class HbmTaskRepository implements TaskRepository {
 
     @Override
     public boolean deleteById(int id) {
-        return false;
+        Session session = sf.openSession();
+        try {
+            session.beginTransaction();
+            session.createQuery(
+                            "delete Task where id = :fId")
+                    .setParameter("fId", id)
+                    .executeUpdate();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
+        return true;
     }
 
     public void update(Task task) {
