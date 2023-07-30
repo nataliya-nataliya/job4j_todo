@@ -25,13 +25,13 @@ public class TaskController {
 
     @GetMapping("/done")
     public String getAllWhereDoneIsTrue(Model model) {
-        model.addAttribute("tasks", taskService.findAllOrderByIdWhereDoneIsTrue());
+        model.addAttribute("tasks", taskService.findByDoneOrderById(true));
         return "tasks/done";
     }
 
     @GetMapping("/undone")
     public String getAllWhereDoneIsFalse(Model model) {
-        model.addAttribute("tasks", taskService.findAllOrderByIdWhereDoneIsFalse());
+        model.addAttribute("tasks", taskService.findByDoneOrderById(false));
         return "tasks/undone";
     }
 
@@ -47,21 +47,13 @@ public class TaskController {
     }
 
     @PostMapping("/{id}")
-    public String postById(Model model, @PathVariable int id) {
-        var taskOptional = taskService.findById(id);
-        if (taskOptional.isEmpty()) {
-            model.addAttribute("message", "There is no such task id");
-            return "errors/404";
-        }
-        Task task = taskOptional.get();
+    public String updateDone(@ModelAttribute Task task, Model model) {
         task.setDone(!task.isDone());
-        try {
-            taskService.update(task);
-            return String.format("redirect:/tasks/%d", task.getId());
-        } catch (Exception exception) {
-            model.addAttribute("message", exception.getMessage());
+        if (!taskService.updateDone(task)) {
+            model.addAttribute("message", "Task status not updated");
             return "errors/404";
         }
+        return String.format("redirect:/tasks/%d", task.getId());
     }
 
     @GetMapping("/create")
@@ -71,13 +63,12 @@ public class TaskController {
 
     @PostMapping("/create")
     public String create(@ModelAttribute Task task, Model model) {
-        try {
-            taskService.save(task);
-            return "redirect:/tasks";
-        } catch (Exception exception) {
-            model.addAttribute("message", exception.getMessage());
+        var taskOptional = taskService.save(task);
+        if (taskOptional.isEmpty()) {
+            model.addAttribute("message", "Task not created");
             return "errors/404";
         }
+        return "redirect:/tasks";
     }
 
     @GetMapping("/delete/{id}")
@@ -89,7 +80,6 @@ public class TaskController {
         }
         return "redirect:/tasks";
     }
-
 
     @GetMapping("/edit/{id}")
     public String editById(Model model, @PathVariable int id) {
@@ -104,12 +94,10 @@ public class TaskController {
 
     @PostMapping("/update")
     public String update(@ModelAttribute Task task, Model model) {
-        try {
-            taskService.update(task);
-            return "redirect:/tasks";
-        } catch (Exception exception) {
-            model.addAttribute("message", exception.getMessage());
+        if (!taskService.update(task)) {
+            model.addAttribute("message", "Task not updated");
             return "errors/404";
         }
+        return "redirect:/tasks";
     }
 }

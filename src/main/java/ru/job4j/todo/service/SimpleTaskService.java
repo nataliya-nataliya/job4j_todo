@@ -16,7 +16,7 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public Task save(Task task) {
+    public Optional<Task> save(Task task) {
         return taskRepository.save(task);
     }
 
@@ -26,8 +26,13 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public void update(Task task) {
-        taskRepository.update(task);
+    public boolean update(Task task) {
+        return taskRepository.update(task);
+    }
+
+    @Override
+    public boolean updateDone(Task task) {
+        return taskRepository.updateDone(task);
     }
 
     @Override
@@ -41,12 +46,7 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public Collection<Task> findAllOrderByIdWhereDoneIsTrue() {
-        return taskRepository.findAllOrderByIdWhereDoneIsTrue();
-    }
-
-    @Override
-    public Collection<Task> findAllOrderByIdWhereDoneIsFalse() {
-        return taskRepository.findAllOrderByIdWhereDoneIsFalse();
+    public Collection<Task> findByDoneOrderById(boolean done) {
+        return taskRepository.findByDoneOrderById(done);
     }
 }

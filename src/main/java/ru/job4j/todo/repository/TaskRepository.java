@@ -6,17 +6,17 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface TaskRepository {
-    Task save(Task task);
+    Optional<Task> save(Task task);
 
     boolean deleteById(int id);
 
-    void update(Task task);
+    boolean update(Task task);
+
+    boolean updateDone(Task task);
 
     Optional<Task> findById(int id);
 
     Collection<Task> findAllOrderById();
 
-    Collection<Task> findAllOrderByIdWhereDoneIsTrue();
-
-    Collection<Task> findAllOrderByIdWhereDoneIsFalse();
+    Collection<Task> findByDoneOrderById(boolean done);
 }

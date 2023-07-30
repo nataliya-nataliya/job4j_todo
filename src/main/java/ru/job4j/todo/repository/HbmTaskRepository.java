@@ -17,24 +17,27 @@ public class HbmTaskRepository implements TaskRepository {
     private final SessionFactory sf;
 
     @Override
-    public Task save(Task task) {
+    public Optional<Task> save(Task task) {
+        Optional<Task> optionalTask = Optional.empty();
         Session session = sf.openSession();
         try {
             session.beginTransaction();
             session.save(task);
+            optionalTask = Optional.of(task);
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
         }
-        return task;
+        return optionalTask;
     }
 
     @Override
     public boolean deleteById(int id) {
+        int affectedRows = 0;
         Session session = sf.openSession();
         try {
             session.beginTransaction();
-            session.createQuery(
+            affectedRows = session.createQuery(
                             "delete Task where id = :fId")
                     .setParameter("fId", id)
                     .executeUpdate();
@@ -42,10 +45,11 @@ public class HbmTaskRepository implements TaskRepository {
         } catch (Exception e) {
             session.getTransaction().rollback();
         }
-        return true;
+        return affectedRows > 0;
     }
 
-    public void update(Task task) {
+    public boolean update(Task task) {
+        boolean isCompletedTransaction = false;
         Session session = sf.openSession();
         try {
             session.beginTransaction();
@@ -56,12 +60,33 @@ public class HbmTaskRepository implements TaskRepository {
                     .setParameter("fDescription", task.getDescription())
                     .setParameter("fCreated", task.getCreated())
                     .setParameter("fDone", task.isDone())
-                    .setParameter("fId", task.getId())
-                    .executeUpdate();
+                    .setParameter("fId", task.getId());
+            session.update(task);
             session.getTransaction().commit();
+            isCompletedTransaction = true;
         } catch (Exception e) {
             session.getTransaction().rollback();
         }
+        return isCompletedTransaction;
+    }
+
+    @Override
+    public boolean updateDone(Task task) {
+        boolean isCompletedTransaction = false;
+        Session session = sf.openSession();
+        try {
+            session.beginTransaction();
+            session.createQuery(
+                            "update Task set done = :fDone where id = :fId")
+                    .setParameter("fDone", task.isDone())
+                    .setParameter("fId", task.getId());
+            session.update(task);
+            session.getTransaction().commit();
+            isCompletedTransaction = true;
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
+        return isCompletedTransaction;
     }
 
     @Override
@@ -97,28 +122,15 @@ public class HbmTaskRepository implements TaskRepository {
     }
 
     @Override
-    public Collection<Task> findAllOrderByIdWhereDoneIsTrue() {
+    public Collection<Task> findByDoneOrderById(boolean done) {
         Session session = sf.openSession();
         List<Task> taskList = new ArrayList<>();
         try {
             session.beginTransaction();
             taskList = session.createQuery(
-                    "from Task where done = true order by id", Task.class).list();
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-        }
-        return taskList;
-    }
-
-    @Override
-    public Collection<Task> findAllOrderByIdWhereDoneIsFalse() {
-        Session session = sf.openSession();
-        List<Task> taskList = new ArrayList<>();
-        try {
-            session.beginTransaction();
-            taskList = session.createQuery(
-                    "from Task where done = false order by id", Task.class).list();
+                            "from Task where done = : fDone order by id", Task.class)
+                    .setParameter("fDone", done)
+                    .list();
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();

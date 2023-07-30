@@ -14,8 +14,9 @@ public class IndexController {
 
     @GetMapping({"/", "/index"})
     public String getAll(Model model) {
-        model.addAttribute("tasks", taskService.findAllOrderById());
-        if (taskService.findAllOrderById().isEmpty()) {
+        var allTasks = taskService.findAllOrderById();
+        model.addAttribute("tasks", allTasks);
+        if (allTasks.isEmpty()) {
             model.addAttribute("error", "To Do Task list is empty. Add new Task");
             return "tasks/all";
         }
