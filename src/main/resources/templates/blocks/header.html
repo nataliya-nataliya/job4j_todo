@@ -8,6 +8,14 @@
                     <a class="nav-item nav-link active" href="/">All Tasks</a>
                     <a class="nav-item nav-link active" href="/tasks/create">Add</a></div>
             </div>
+            <div class="d-flex" th:if="${user.name == 'Guest'}">
+                <a class="nav-link text-light me-3" th:href="@{/users/register}">Create account</a>
+                <a class="nav-link text-light" th:href="@{/users/login}">Sign up</a>
+            </div>
+            <div class="d-flex" th:if="${user.name != 'Guest'}">
+                <a class="nav-link text-light me-3" href="#" th:text="${user.name}"></a>
+                <a class="nav-link text-light" th:href="@{/users/logout}">Log Out</a>
+            </div>
         </div>
     </nav>
 </div>

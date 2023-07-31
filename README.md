@@ -13,6 +13,9 @@ Task storage service.
 The service allows you to create, view description, delete a task. 
 You can change the status of a task from undone to done and otherwise. 
 You can view the list of all tasks, the list of done tasks or the list of undone tasks.
+The division of rights:
+1) Only authorized users can view and edit tasks.
+2) All tasks are available to any authorized user
 
 ### Technology stack 
 
@@ -53,20 +56,26 @@ Use console and press the keys:
 `Ctrl + C` or `Ctrl + Break` or `Ctrl + Z`
 
 ### Application interaction
-1. Main page:
+1. Login page:
+   ![Login page](img/login_page.png)
+____
+2. Register page:
+   ![Register page](img/register_page.png)
+____
+3. Main page:
    ![Main page](img/main_page.png)
 ____
-2. Done tasks page
+4. Done tasks page
    ![Done tasks page](img/done_tasks_page.png)
 ____
-3. Undone tasks page
+5. Undone tasks page
    ![Undone tasks page](img/undone_tasks_page.png)
 ____
-4. Task view page
+6. Task view page
    ![Task view page](img/task_view_page.png)
 ____
-5. Add task page
+7. Add task page
    ![Add task page](img/add_task_page.png)
 ____
-6. Edit task page
+8. Edit task page
    ![Edit task page](img/edit_task_page.png)
