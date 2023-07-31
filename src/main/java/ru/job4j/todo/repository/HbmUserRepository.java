@@ -1,50 +1,37 @@
 package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.User;
 
+import javax.persistence.PersistenceException;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
 public class HbmUserRepository implements UserRepository {
 
-    private final SessionFactory sf;
+    private final CrudRepository crudRepository;
 
     @Override
     public Optional<User> save(User user) {
-        Optional<User> optionalUser = Optional.empty();
-        Session session = sf.openSession();
+        Optional<User> optionalUser;
         try {
-            session.beginTransaction();
-            session.save(user);
+            crudRepository.run(session -> session.persist(user));
             optionalUser = Optional.of(user);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
+        } catch (PersistenceException e) {
+            optionalUser = Optional.empty();
         }
         return optionalUser;
     }
 
     @Override
     public Optional<User> findByEmailAndPassword(String email, String password) {
-        Session session = sf.openSession();
-        Optional<User> optionalUser = Optional.empty();
-        try {
-            session.beginTransaction();
-            optionalUser = session.createQuery(
-                            "from User as u where u.email = :fEmail and "
-                                    + "u.password = :fPassword", User.class)
-                    .setParameter("fEmail", email)
-                    .setParameter("fPassword", password)
-                    .uniqueResultOptional();
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-        }
-        return optionalUser;
+        return crudRepository.optional(
+                "from User as u where u.email = :fEmail and "
+                        + "u.password = :fPassword", User.class,
+                Map.of("fEmail", email, "fPassword", password)
+        );
     }
 }
