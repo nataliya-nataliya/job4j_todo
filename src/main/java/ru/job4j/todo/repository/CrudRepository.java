@@ -81,6 +81,8 @@ public class CrudRepository {
                 transaction.rollback();
             }
             throw e;
+        } finally {
+            session.close();
         }
     }
 }
