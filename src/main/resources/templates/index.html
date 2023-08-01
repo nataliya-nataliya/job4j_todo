@@ -55,6 +55,7 @@
                     <th scope="col">Name</th>
                     <th scope="col">Time of creation</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Name of the user</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -62,7 +63,8 @@
                     th:style="${rowIndex.even} ? 'background-color: #F1DCFF;' : 'background-color: #ffffff;'">
                     <td><a th:text="${task.name}" th:href="@{/tasks/{taskId}(taskId=${task.id})}"></a>
                     </td>
-                    <td th:text="${#temporals.format(task.created, 'dd-MM-yyyy HH:mm:ss')}"/>
+                    <td th:text="${task.created}"/>
+                    </td>
                     <td>
                         <span th:if="${task.done}">
                                 <i class="fas fa-check-circle" style="color: #B57EDC; font-size: 24px;"></i>
@@ -71,12 +73,14 @@
                                 <i class="fas fa-times-circle" style="color: #B57EDC; font-size: 24px;"></i>
                             </span>
                     </td>
+                    <td th:text="${task.userName}"/>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
+    <footer th:insert="blocks/footer :: footer"></footer>
 </div>
-<footer th:insert="blocks/footer :: footer"></footer>
 </body>
 </html>

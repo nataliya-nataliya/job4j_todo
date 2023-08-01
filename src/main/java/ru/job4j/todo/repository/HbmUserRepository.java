@@ -34,4 +34,12 @@ public class HbmUserRepository implements UserRepository {
                 Map.of("fEmail", email, "fPassword", password)
         );
     }
+
+    @Override
+    public Optional<User> findById(int id) {
+        return crudRepository.optional(
+                "from User as u where u.id = :fId", User.class,
+                Map.of("fId", id)
+        );
+    }
 }

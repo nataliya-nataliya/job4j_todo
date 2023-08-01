@@ -1,5 +1,6 @@
 package ru.job4j.todo.service;
 
+import ru.job4j.todo.dto.TaskDto;
 import ru.job4j.todo.model.Task;
 
 import java.util.Collection;
@@ -16,7 +17,7 @@ public interface TaskService {
 
     Optional<Task> findById(int id);
 
-    Collection<Task> findAllOrderById();
+    Collection<TaskDto> findAllOrderById();
 
-    Collection<Task> findByDoneOrderById(boolean done);
+    Collection<TaskDto> findByDoneOrderById(boolean done);
 }

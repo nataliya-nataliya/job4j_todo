@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.TaskService;
+import ru.job4j.todo.service.UserService;
 
 @AllArgsConstructor
 @Controller
