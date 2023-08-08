@@ -1,26 +1,18 @@
 package ru.job4j.todo.service;
 
 import org.springframework.stereotype.Service;
-import ru.job4j.todo.dto.TaskDto;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.repository.TaskRepository;
-import ru.job4j.todo.repository.UserRepository;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class SimpleTaskService implements TaskService {
     private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
 
-    public SimpleTaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    public SimpleTaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-        this.userRepository = userRepository;
     }
 
     @Override
@@ -49,36 +41,12 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public Collection<TaskDto> findAllOrderById() {
-        List<TaskDto> taskDtoList = new ArrayList<>();
-        for (Task task : taskRepository.findAllOrderById()) {
-            taskDtoList.add(new TaskDto(
-                    task.getId(),
-                    task.getName(),
-                    formatLocalDateTime(task.getCreated()),
-                    task.isDone(),
-                    userRepository.findById(task.getUser().getId()).get().getName()));
-        }
-        return taskDtoList;
+    public Collection<Task> findAllOrderById() {
+        return taskRepository.findAllOrderById();
     }
 
     @Override
-    public Collection<TaskDto> findByDoneOrderById(boolean done) {
-
-        List<TaskDto> taskDtoList = new ArrayList<>();
-        for (Task task : taskRepository.findByDoneOrderById(done)) {
-            taskDtoList.add(new TaskDto(
-                    task.getId(),
-                    task.getName(),
-                    formatLocalDateTime(task.getCreated()),
-                    task.isDone(),
-                    userRepository.findById(task.getUser().getId()).get().getName()));
-        }
-        return taskDtoList;
-    }
-
-    public String formatLocalDateTime(LocalDateTime startTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-        return startTime.format(formatter);
+    public Collection<Task> findByDoneOrderById(boolean done) {
+        return taskRepository.findByDoneOrderById(done);
     }
 }
