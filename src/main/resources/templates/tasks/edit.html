@@ -30,6 +30,13 @@
                         <input type="text" class="form-control" id="name" name="name" th:field="*{name}"
                                placeholder="For example, Task 1">
                     </div>
+                    <div class="mb-3">
+                        <label for="priority"><b>Priority</b></label>
+                        <select class="form-control" id="priority" name="priority.id">
+                            <option th:each="priority : ${priorities}" th:value="${priority.id}"
+                                    th:text="${priority.name}"></option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="mb-3">

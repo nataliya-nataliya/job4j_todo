@@ -52,6 +52,7 @@
                     <th scope="col">Time of creation</th>
                     <th scope="col">Status</th>
                     <th scope="col">Name of the user</th>
+                    <th scope="col">Priority of task</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -69,6 +70,12 @@
                             </span>
                     </td>
                     <td th:text="${task.user.name}"/>
+                    </td>
+                    <td>
+                        <i class="fa-solid fa-fire" style="color: #FF00FF; font-size: 24px;"
+                           th:if="${task.priority.name == 'urgently'}"></i>
+                        <i class="fa-solid fa-dot-circle" style="color: #B57EDC; font-size: 24px;"
+                           th:if="${task.priority.name == 'normal'}"></i>
                     </td>
                 </tr>
                 </tbody>

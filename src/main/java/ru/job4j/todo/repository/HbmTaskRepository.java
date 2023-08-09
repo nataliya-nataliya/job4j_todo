@@ -44,7 +44,14 @@ public class HbmTaskRepository implements TaskRepository {
     public boolean update(Task task) {
         boolean isCompletedTransaction;
         try {
-            crudRepository.run(session -> session.merge(task));
+            crudRepository.run(
+                    "update Task set name = : fName, description = : fDescription, "
+                            + "priority_id = : fPriorityId where id = :fId",
+                    Map.of("fName", task.getName(),
+                            "fDescription", task.getDescription(),
+                            "fPriorityId", task.getPriority(),
+                            "fId", task.getId())
+            );
             isCompletedTransaction = true;
         } catch (PersistenceException e) {
             isCompletedTransaction = false;
@@ -71,20 +78,20 @@ public class HbmTaskRepository implements TaskRepository {
     @Override
     public Optional<Task> findById(int id) {
         return crudRepository.optional(
-                "from Task where id = :fId", Task.class,
+                "from Task f join fetch f.priority where f.id = :fId", Task.class,
                 Map.of("fId", id)
         );
     }
 
     @Override
     public Collection<Task> findAllOrderById() {
-        return crudRepository.query("from Task order by id", Task.class);
+        return crudRepository.query("from Task f join fetch f.priority order by f.id", Task.class);
     }
 
     @Override
     public Collection<Task> findByDoneOrderById(boolean done) {
         return crudRepository.query(
-                "from Task where done = : fDone order by id", Task.class,
+                "from Task f JOIN FETCH f.priority where done = : fDone order by f.id", Task.class,
                 Map.of("fDone", done)
         );
     }
