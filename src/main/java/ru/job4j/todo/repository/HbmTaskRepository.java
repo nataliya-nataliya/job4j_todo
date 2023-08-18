@@ -44,14 +44,7 @@ public class HbmTaskRepository implements TaskRepository {
     public boolean update(Task task) {
         boolean isCompletedTransaction;
         try {
-            crudRepository.run(
-                    "update Task set name = : fName, description = : fDescription, "
-                            + "priority_id = : fPriorityId where id = :fId",
-                    Map.of("fName", task.getName(),
-                            "fDescription", task.getDescription(),
-                            "fPriorityId", task.getPriority(),
-                            "fId", task.getId())
-            );
+            crudRepository.run(session -> session.merge(task));
             isCompletedTransaction = true;
         } catch (PersistenceException e) {
             isCompletedTransaction = false;
