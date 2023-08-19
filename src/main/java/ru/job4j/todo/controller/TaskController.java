@@ -4,12 +4,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @Controller
@@ -17,6 +22,7 @@ import javax.servlet.http.HttpSession;
 public class TaskController {
     private final TaskService taskService;
     private final PriorityService priorityService;
+    private final CategoryService categoryService;
 
     @GetMapping
     public String getAll(Model model) {
@@ -64,11 +70,26 @@ public class TaskController {
     @GetMapping("/create")
     public String getCreationPage(Model model) {
         model.addAttribute("priorities", priorityService.findAllOrderByPosition());
+        model.addAttribute("categories", categoryService.findAllOrderById());
         return "tasks/create";
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute Task task, Model model, HttpSession session) {
+    public String create(@ModelAttribute Task task, Model model, HttpSession session,
+                         @RequestParam(value = "categories", required = false)
+                         List<Integer> selectedIdCategories) {
+        if (selectedIdCategories == null) {
+            model.addAttribute("priorities", priorityService.findAllOrderByPosition());
+            model.addAttribute("categories", categoryService.findAllOrderById());
+            model.addAttribute("error", "You must select at least 1 category");
+            return "tasks/create";
+        } else {
+            Set<Category> selectedCategories = new HashSet<>();
+            for (Integer categoryId : selectedIdCategories) {
+                selectedCategories.add(categoryService.findById(categoryId).get());
+            }
+            task.setTaskCategoryList(selectedCategories);
+        }
         task.setUser((User) session.getAttribute("user"));
         var taskOptional = taskService.save(task);
         if (taskOptional.isEmpty()) {
