@@ -5,8 +5,8 @@ import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Category;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
@@ -19,10 +19,10 @@ public class HbmCategoryRepository implements CategoryRepository {
     }
 
     @Override
-    public Optional<Category> findById(int id) {
-        return crudRepository.optional(
-                "from Category f where f.id = :fId", Category.class,
-                Map.of("fId", id)
+    public Collection<Category> findByMultipleIdsOrderById(List<Integer> categoriesIdList) {
+        return crudRepository.query(
+                "from Category f where f.id in :fIdList", Category.class,
+                Map.of("fIdList", categoriesIdList)
         );
     }
 }
