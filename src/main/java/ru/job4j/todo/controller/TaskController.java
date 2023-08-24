@@ -11,6 +11,10 @@ import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -23,40 +27,92 @@ public class TaskController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public String getAll(Model model) {
+    public String getAll(Model model, HttpSession session) {
         model.addAttribute("tasks", taskService.findAllOrderById());
         if (taskService.findAllOrderById().isEmpty()) {
             model.addAttribute("error", "To Do Task list is empty. Add new Task");
             return "tasks/all";
         }
+        var user = (User) session.getAttribute("user");
+        var userCurrentTimeZone = user.getTimezone();
+        List<Task> taskList = new ArrayList<>(taskService.findAllOrderById());
+        for (Task task : taskList) {
+            var userCreatedTaskTimeZone = task.getUser().getTimezone();
+            LocalDateTime created = task.getCreated();
+            if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
+                ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
+                ZonedDateTime convertedTime = zonedCreated
+                        .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
+                task.setCreated(convertedTime.toLocalDateTime());
+            }
+        }
+        model.addAttribute("tasks", taskList);
         return "tasks/all";
     }
 
     @GetMapping("/done")
-    public String getAllWhereDoneIsTrue(Model model) {
-        model.addAttribute("tasks", taskService.findByDoneOrderById(true));
+    public String getAllWhereDoneIsTrue(Model model, HttpSession session) {
+        var user = (User) session.getAttribute("user");
+        var userCurrentTimeZone = user.getTimezone();
+        List<Task> taskList = new ArrayList<>(taskService.findByDoneOrderById(true));
+        for (Task task : taskList) {
+            var userCreatedTaskTimeZone = task.getUser().getTimezone();
+            LocalDateTime created = task.getCreated();
+            if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
+                ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
+                ZonedDateTime convertedTime = zonedCreated
+                        .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
+                task.setCreated(convertedTime.toLocalDateTime());
+            }
+        }
+        model.addAttribute("tasks", taskList);
         return "tasks/done";
     }
 
     @GetMapping("/undone")
-    public String getAllWhereDoneIsFalse(Model model) {
-        model.addAttribute("tasks", taskService.findByDoneOrderById(false));
+    public String getAllWhereDoneIsFalse(Model model, HttpSession session) {
+        var user = (User) session.getAttribute("user");
+        var userCurrentTimeZone = user.getTimezone();
+        List<Task> taskList = new ArrayList<>(taskService.findByDoneOrderById(false));
+        for (Task task : taskList) {
+            var userCreatedTaskTimeZone = task.getUser().getTimezone();
+            LocalDateTime created = task.getCreated();
+            if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
+                ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
+                ZonedDateTime convertedTime = zonedCreated
+                        .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
+                task.setCreated(convertedTime.toLocalDateTime());
+            }
+        }
+        model.addAttribute("tasks", taskList);
         return "tasks/undone";
     }
 
     @GetMapping("/{id}")
-    public String getById(Model model, @PathVariable int id) {
+    public String getById(Model model, @PathVariable int id, HttpSession session) {
         var taskOptional = taskService.findById(id);
         if (taskOptional.isEmpty()) {
             model.addAttribute("message", "Task with the specified ID was not found");
             return "errors/404";
         }
         model.addAttribute("task", taskOptional.get());
+        var user = (User) session.getAttribute("user");
+        var userCurrentTimeZone = user.getTimezone();
+        var userCreatedTaskTimeZone = taskOptional.get().getUser().getTimezone();
+        LocalDateTime created = taskOptional.get().getCreated();
+        if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
+            ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
+            ZonedDateTime convertedTime = zonedCreated
+                    .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
+            taskOptional.get().setCreated(convertedTime.toLocalDateTime());
+        }
         return "tasks/one";
     }
 
     @PostMapping("/{id}")
-    public String updateDone(@ModelAttribute Task task, Model model) {
+    public String updateDone(@ModelAttribute Task task, Model model, HttpSession session) {
+        var user = (User) session.getAttribute("user");
+        task.setUser(user);
         task.setDone(!task.isDone());
         if (!taskService.updateDone(task)) {
             model.addAttribute("message", "Task status not updated");

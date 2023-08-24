@@ -12,4 +12,5 @@
     <include file="scripts/005_dml_update_priorities_and_tasks.sql" relativeToChangelogFile="true"/>
     <include file="scripts/006_ddl_create_categories_scheme.sql" relativeToChangelogFile="true"/>
     <include file="scripts/007_dml_insert_categories.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/008_dml_update_user_scheme.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

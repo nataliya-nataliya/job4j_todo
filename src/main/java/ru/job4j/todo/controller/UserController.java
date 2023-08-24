@@ -11,6 +11,7 @@ import ru.job4j.todo.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.TimeZone;
 
 @Controller
 @RequestMapping("/users")
@@ -22,16 +23,20 @@ public class UserController {
     }
 
     @GetMapping("/register")
-    public String getRegistrationPage() {
+    public String getRegistrationPage(Model model) {
+        model.addAttribute("timeZones", userService.getAllTimeZone());
         return "users/register";
-
     }
 
     @PostMapping("/register")
     public String register(Model model, @ModelAttribute User user) {
+        if (user.getTimezone() == null) {
+            user.setTimezone(TimeZone.getDefault().getID());
+        }
         var savedUser = userService.save(user);
         if (savedUser.isEmpty()) {
             model.addAttribute("error", "User with this email already exists");
+            model.addAttribute("timeZones", userService.getAllTimeZone());
             user.setName("Guest");
             return "users/register";
         }

@@ -19,4 +19,5 @@ public class User {
     @EqualsAndHashCode.Include
     private String email;
     private String password;
+    private String timezone;
 }
