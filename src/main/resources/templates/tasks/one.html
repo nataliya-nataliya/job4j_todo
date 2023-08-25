@@ -55,7 +55,7 @@
                 <div class="col-4 text-right">
                     <div class="col-8">
                         <span><strong>Created:</strong></span>
-                        <span th:text="${#temporals.format(task.created, 'dd-MM-yyyy HH:mm:ss')}|"></span>
+                        <span th:text="${#temporals.format(task.convertedCreated, 'dd-MM-yyyy HH:mm:ss')}|"></span>
                     </div>
                 </div>
                 <hr style="border: 1px solid #ccc;">
@@ -71,10 +71,7 @@
                     </div>
                     <div class="col-2">
                         <form class="mt-3" th:action="@{/tasks/{id}(id=${task.id})}" method="post" th:object="${task}">
-                            <input type="hidden" name="name" th:field="*{name}">
-                            <input type="hidden" name="description" th:field="*{description}">
                             <input type="hidden" name="done" th:field="*{done}">
-                            <input type="hidden" name="created" th:field="*{created}">
                             <button class="btn rounded-pill px-4" type="submit"
                                     th:style="'background-color: #B57EDC; color: #fff; border: 2px solid #B57EDC; width: 100%;'"
                                     style="display: flex; align-items: center; justify-content: center;">

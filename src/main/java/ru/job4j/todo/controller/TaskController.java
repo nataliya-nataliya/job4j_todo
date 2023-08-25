@@ -11,9 +11,6 @@ import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 
 import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,25 +25,15 @@ public class TaskController {
 
     @GetMapping
     public String getAll(Model model, HttpSession session) {
-        model.addAttribute("tasks", taskService.findAllOrderById());
-        if (taskService.findAllOrderById().isEmpty()) {
+        var user = (User) session.getAttribute("user");
+        var userCurrentTimeZone = user.getTimezone();
+        model.addAttribute("tasks", taskService.findAllOrderById(userCurrentTimeZone));
+        if (taskService.findAllOrderById(userCurrentTimeZone).isEmpty()) {
             model.addAttribute("error", "To Do Task list is empty. Add new Task");
             return "tasks/all";
         }
-        var user = (User) session.getAttribute("user");
-        var userCurrentTimeZone = user.getTimezone();
-        List<Task> taskList = new ArrayList<>(taskService.findAllOrderById());
-        for (Task task : taskList) {
-            var userCreatedTaskTimeZone = task.getUser().getTimezone();
-            LocalDateTime created = task.getCreated();
-            if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
-                ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
-                ZonedDateTime convertedTime = zonedCreated
-                        .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
-                task.setCreated(convertedTime.toLocalDateTime());
-            }
-        }
-        model.addAttribute("tasks", taskList);
+        model.addAttribute("tasks",
+                new ArrayList<>(taskService.findAllOrderById(userCurrentTimeZone)));
         return "tasks/all";
     }
 
@@ -54,18 +41,8 @@ public class TaskController {
     public String getAllWhereDoneIsTrue(Model model, HttpSession session) {
         var user = (User) session.getAttribute("user");
         var userCurrentTimeZone = user.getTimezone();
-        List<Task> taskList = new ArrayList<>(taskService.findByDoneOrderById(true));
-        for (Task task : taskList) {
-            var userCreatedTaskTimeZone = task.getUser().getTimezone();
-            LocalDateTime created = task.getCreated();
-            if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
-                ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
-                ZonedDateTime convertedTime = zonedCreated
-                        .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
-                task.setCreated(convertedTime.toLocalDateTime());
-            }
-        }
-        model.addAttribute("tasks", taskList);
+        model.addAttribute("tasks",
+                new ArrayList<>(taskService.findByDoneOrderById(true, userCurrentTimeZone)));
         return "tasks/done";
     }
 
@@ -73,39 +50,21 @@ public class TaskController {
     public String getAllWhereDoneIsFalse(Model model, HttpSession session) {
         var user = (User) session.getAttribute("user");
         var userCurrentTimeZone = user.getTimezone();
-        List<Task> taskList = new ArrayList<>(taskService.findByDoneOrderById(false));
-        for (Task task : taskList) {
-            var userCreatedTaskTimeZone = task.getUser().getTimezone();
-            LocalDateTime created = task.getCreated();
-            if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
-                ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
-                ZonedDateTime convertedTime = zonedCreated
-                        .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
-                task.setCreated(convertedTime.toLocalDateTime());
-            }
-        }
-        model.addAttribute("tasks", taskList);
+        model.addAttribute("tasks",
+                new ArrayList<>(taskService.findByDoneOrderById(false, userCurrentTimeZone)));
         return "tasks/undone";
     }
 
     @GetMapping("/{id}")
     public String getById(Model model, @PathVariable int id, HttpSession session) {
-        var taskOptional = taskService.findById(id);
+        var user = (User) session.getAttribute("user");
+        var userCurrentTimeZone = user.getTimezone();
+        var taskOptional = taskService.findById(id, userCurrentTimeZone);
         if (taskOptional.isEmpty()) {
             model.addAttribute("message", "Task with the specified ID was not found");
             return "errors/404";
         }
         model.addAttribute("task", taskOptional.get());
-        var user = (User) session.getAttribute("user");
-        var userCurrentTimeZone = user.getTimezone();
-        var userCreatedTaskTimeZone = taskOptional.get().getUser().getTimezone();
-        LocalDateTime created = taskOptional.get().getCreated();
-        if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
-            ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
-            ZonedDateTime convertedTime = zonedCreated
-                    .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
-            taskOptional.get().setCreated(convertedTime.toLocalDateTime());
-        }
         return "tasks/one";
     }
 
@@ -160,9 +119,11 @@ public class TaskController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editById(Model model, @PathVariable int id) {
+    public String editById(Model model, @PathVariable int id, HttpSession session) {
+        var user = (User) session.getAttribute("user");
+        var userCurrentTimeZone = user.getTimezone();
         model.addAttribute("priorities", priorityService.findAllOrderByPosition());
-        var taskOptional = taskService.findById(id);
+        var taskOptional = taskService.findById(id, userCurrentTimeZone);
         if (taskOptional.isEmpty()) {
             model.addAttribute("message", "Task with the specified ID was not found");
             return "errors/404";

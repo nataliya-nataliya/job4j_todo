@@ -60,7 +60,7 @@
                     th:style="${rowIndex.even} ? 'background-color: #F1DCFF;' : 'background-color: #ffffff;'">
                     <td><a th:text="${task.name}" th:href="@{/tasks/{taskId}(taskId=${task.id})}"></a>
                     </td>
-                    <td th:text="${#temporals.format(task.created, 'yyyy-MM-dd HH:mm:ss')}"/>
+                    <td th:text="${#temporals.format(task.convertedCreated, 'yyyy-MM-dd HH:mm:ss')}"/>
                     <td>
                         <span th:if="${task.done}">
                                 <i class="fas fa-check-circle" style="color: #B57EDC; font-size: 24px;"></i>

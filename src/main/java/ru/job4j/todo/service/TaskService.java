@@ -1,5 +1,6 @@
 package ru.job4j.todo.service;
 
+import ru.job4j.todo.dto.TaskDto;
 import ru.job4j.todo.model.Task;
 
 import java.util.Collection;
@@ -14,10 +15,10 @@ public interface TaskService {
 
     boolean updateDone(Task task);
 
-    Optional<Task> findById(int id);
+    Optional<TaskDto> findById(int id, String userCurrentTimeZone);
 
-    Collection<Task> findAllOrderById();
+    Collection<TaskDto> findAllOrderById(String userCurrentTimeZone);
 
-    Collection<Task> findByDoneOrderById(boolean done);
+    Collection<TaskDto> findByDoneOrderById(boolean done, String userCurrentTimeZone);
 
 }

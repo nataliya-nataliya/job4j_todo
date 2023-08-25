@@ -2,10 +2,16 @@ package ru.job4j.todo.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.job4j.todo.dto.TaskDto;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.repository.TaskRepository;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,17 +40,51 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public Optional<Task> findById(int id) {
-        return taskRepository.findById(id);
+    public Optional<TaskDto> findById(int id, String userCurrentTimeZone) {
+        return convertCreatedOfTask(taskRepository.findById(id), userCurrentTimeZone);
     }
 
     @Override
-    public Collection<Task> findAllOrderById() {
-        return taskRepository.findAllOrderById();
+    public Collection<TaskDto> findAllOrderById(String userCurrentTimeZone) {
+        return convertCreatedOfTasksList(taskRepository.findAllOrderById(), userCurrentTimeZone);
     }
 
     @Override
-    public Collection<Task> findByDoneOrderById(boolean done) {
-        return taskRepository.findByDoneOrderById(done);
+    public Collection<TaskDto> findByDoneOrderById(boolean done, String userCurrentTimeZone) {
+        return convertCreatedOfTasksList(taskRepository
+                .findByDoneOrderById(done), userCurrentTimeZone);
+    }
+
+    private Collection<TaskDto> convertCreatedOfTasksList(Collection<Task> taskList,
+                                                          String userCurrentTimeZone) {
+        List<TaskDto> taskDtoList = new ArrayList<>();
+        for (Task task : taskList) {
+            var userCreatedTaskTimeZone = task.getUser().getTimezone();
+            LocalDateTime created = task.getCreated();
+            if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
+                ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
+                ZonedDateTime convertedTime = zonedCreated
+                        .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
+                task.setCreated(convertedTime.toLocalDateTime());
+            }
+            taskDtoList.add(new TaskDto(task.getId(), task.getName(), task.getDescription(),
+                    created, task.getCreated(), task.isDone(), task.getUser(), task.getPriority()));
+        }
+        return taskDtoList;
+    }
+
+    private Optional<TaskDto> convertCreatedOfTask(Optional<Task> optionalTask,
+                                                   String userCurrentTimeZone) {
+            var task = optionalTask.get();
+            var userCreatedTaskTimeZone = task.getUser().getTimezone();
+            LocalDateTime created = task.getCreated();
+            if (!userCurrentTimeZone.equals(userCreatedTaskTimeZone)) {
+                ZonedDateTime zonedCreated = created.atZone(ZoneId.of(userCreatedTaskTimeZone));
+                ZonedDateTime convertedTime = zonedCreated
+                        .withZoneSameInstant(ZoneId.of(userCurrentTimeZone));
+                task.setCreated(convertedTime.toLocalDateTime());
+            }
+            return Optional.of(new TaskDto(task.getId(), task.getName(), task.getDescription(),
+                    created, task.getCreated(), task.isDone(), task.getUser(), task.getPriority()));
     }
 }
