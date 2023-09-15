@@ -9,10 +9,13 @@
 ____
 ### Project description
 
-Task storage service. 
-The service allows you to create, view description, delete a task. 
-You can change the status of a task from undone to done and otherwise. 
-You can view the list of all tasks, the list of done tasks or the list of undone tasks.
+Task storage service. The service allows you to create, view descriptions, 
+and delete tasks. You can change the task status from Canceled to Completed, etc. 
+You can select the priority of the task when creating it and then change it. 
+When creating a task, you must select at least one category (Work, Education, etc.). 
+The task creation time is displayed taking into account your time zone, which you select when creating your account.
+You can view a list of all tasks, a list of completed tasks, or a list of uncompleted tasks.
+
 The division of rights:
 1) Only authorized users can view and edit tasks.
 2) All tasks are available to any authorized user
